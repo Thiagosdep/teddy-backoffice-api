@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AppLogger } from './infrastructure/logger/logger.service';
 import { WinstonLoggerService } from './infrastructure/observability/logger/winston-logger.service';
 
 describe('AppController', () => {
@@ -12,7 +11,6 @@ describe('AppController', () => {
       controllers: [AppController],
       providers: [
         AppService,
-        AppLogger,
         {
           provide: WinstonLoggerService,
           useValue: {

@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { LoggerModule } from './infrastructure/logger/logger.module';
 import { UserModule } from './user/user.module';
 import { UserController } from './user/user.controller';
 import { UserService } from './user/user.service';
@@ -17,7 +16,6 @@ import { ObservabilityModule } from './infrastructure/observability/observabilit
 
 @Module({
   imports: [
-    LoggerModule,
     UserModule,
     TypeOrmModule.forRootAsync(
       databaseProviders(ConnectionNameEnum.READ_WRITE),
