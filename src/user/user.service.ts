@@ -5,7 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, In } from 'typeorm';
 import { UserEntity } from './entities/User.entity';
 import { UserCompanyEntity } from './entities/UserCompany.entity';
 import { CreateUserDTO, UpdateUserDTO } from './dtos/user.controller.dto';
@@ -244,5 +244,39 @@ export class UserService {
       await transactionalEntityManager.softDelete(UserEntity, id);
       this.logger.log(`User soft deleted with id=${id}`, 'UserService');
     });
+  }
+
+  async getBatch(ids: string[]): Promise<UserEntity[]> {
+    this.logger.log(
+      `Fetching batch of users with ids=${ids.join(', ')}`,
+      'UserService',
+    );
+
+    if (!ids || ids.length === 0) {
+      this.logger.warn('Empty batch request received', 'UserService');
+      return [];
+    }
+
+    const users = await this.userReaderRepository.find({
+      where: { id: In(ids) },
+      relations: ['userCompanies'],
+    });
+
+    if (users.length !== ids.length) {
+      const foundIds = users.map((user) => user.id);
+      const missingIds = ids.filter((id) => !foundIds.includes(id));
+      this.logger.error(
+        `Some users not found: ${missingIds.join(', ')}`,
+        undefined,
+        'UserService',
+      );
+      throw new NotFoundException('One or more users not found');
+    }
+
+    this.logger.log(
+      `Found ${users.length} users in batch request`,
+      'UserService',
+    );
+    return users.map((user) => new UserEntity(user));
   }
 }

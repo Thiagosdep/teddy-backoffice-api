@@ -6,13 +6,19 @@ import { AdminUserEntity } from './entities/AdminUser.entity';
 import { AuthModule } from '../auth/auth.module';
 import { ConnectionNameEnum } from '../infrastructure/database/database.provider';
 import { ObservabilityModule } from '../infrastructure/observability/observability.module';
+import { RedisModule } from '../infrastructure/cache/redis/redis.module';
 
 const typeOrmFeatureConfig = [
   TypeOrmModule.forFeature([AdminUserEntity], ConnectionNameEnum.READ_WRITE),
 ];
 
 @Module({
-  imports: [...typeOrmFeatureConfig, AuthModule, ObservabilityModule],
+  imports: [
+    ...typeOrmFeatureConfig,
+    AuthModule,
+    ObservabilityModule,
+    RedisModule,
+  ],
   providers: [AdminUserService],
   controllers: [AdminUserController],
   exports: [AdminUserService, ...typeOrmFeatureConfig],

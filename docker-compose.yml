@@ -10,12 +10,14 @@ services:
       - postgres
       - loki
       - prometheus
+      - redis
     env_file:
       - .env.docker
     environment:
       - DB_HOST_READ_WRITE=postgres
       - DB_HOST_READ_ONLY=postgres
       - LOKI_URL=http://loki:3100
+      - REDIS_URL=redis://redis:6379
     volumes:
       - .:/app
       - /app/node_modules
@@ -75,6 +77,15 @@ services:
       - "14268:14268"  # Collector HTTP
       - "6831:6831/udp"  # Collector UDP
 
+  redis:
+    image: redis:alpine
+    container_name: teddy-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
 volumes:
   postgres_data:
     driver: local
@@ -83,5 +94,7 @@ volumes:
   prometheus_data:
     driver: local
   grafana_data:
+    driver: local
+  redis_data:
     driver: local
     

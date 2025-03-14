@@ -1,10 +1,11 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Get, Request } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AdminUserService } from './admin-user.service';
 import {
   AdminAuthResponseDTO,
   AdminCreateDTO,
   AdminLoginDTO,
+  AdminUserIdsDTO,
 } from './dtos/admin-user.controller.dto';
 import { Public } from '../auth/decorators/public.decorator';
 import { AdminUserEntity } from './entities/AdminUser.entity';
@@ -59,5 +60,53 @@ export class AdminUserController {
       'AdminUserController',
     );
     return { token };
+  }
+
+  @Post('/users/select')
+  @ApiResponse({
+    status: 200,
+    description: 'User IDs cached successfully',
+  })
+  async cacheUserIds(
+    @Body() body: AdminUserIdsDTO,
+    @Request() req,
+  ): Promise<{ success: boolean }> {
+    const adminId = req.user.sub;
+    this.logger.log(
+      `Caching ${body.userIds.length} user IDs for admin ID=${adminId}`,
+      'AdminUserController',
+    );
+
+    await this.adminUserService.cacheUserIds(adminId, body.userIds);
+
+    this.logger.log(
+      `Successfully cached user IDs for admin ID=${adminId}`,
+      'AdminUserController',
+    );
+
+    return { success: true };
+  }
+
+  @Get('/users/select')
+  @ApiResponse({
+    status: 200,
+    description: 'Get cached user IDs for admin',
+    type: AdminUserIdsDTO,
+  })
+  async getUserIds(@Request() req): Promise<AdminUserIdsDTO> {
+    const adminId = req.user.sub;
+    this.logger.log(
+      `Retrieving cached user IDs for admin ID=${adminId}`,
+      'AdminUserController',
+    );
+
+    const userIds = await this.adminUserService.getUserIds(adminId);
+
+    this.logger.log(
+      `Retrieved ${userIds.length} cached user IDs for admin ID=${adminId}`,
+      'AdminUserController',
+    );
+
+    return { userIds };
   }
 }

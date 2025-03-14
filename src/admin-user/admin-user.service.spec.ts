@@ -8,8 +8,9 @@ import { AdminLoginDTO } from './dtos/admin-user.controller.dto';
 import * as bcrypt from 'bcrypt';
 import { ConnectionNameEnum } from '../infrastructure/database/database.provider';
 import { WinstonLoggerService } from '../infrastructure/observability/logger/winston-logger.service';
+import { RedisService } from '../infrastructure/cache/redis/redis.service';
+import { randomUUID } from 'crypto';
 
-// Mock bcrypt
 jest.mock('bcrypt', () => ({
   compare: jest.fn(),
   hash: jest.fn(),
@@ -19,14 +20,31 @@ describe('AdminUserService', () => {
   let service: AdminUserService;
   let jwtService: JwtService;
   let adminUserRepository: any;
+  let redisService: any;
+  let loggerService: any;
 
   const mockAdminUser = {
-    id: 'test-uuid',
+    id: randomUUID(),
     login: 'admin',
     password: 'hashedPassword',
   };
 
   beforeEach(async () => {
+    // Create mock logger service
+    loggerService = {
+      log: jest.fn(),
+      error: jest.fn(),
+      warn: jest.fn(),
+      debug: jest.fn(),
+    };
+
+    // Create mock Redis service
+    redisService = {
+      set: jest.fn().mockResolvedValue(undefined),
+      get: jest.fn(),
+      del: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AdminUserService,
@@ -49,12 +67,11 @@ describe('AdminUserService', () => {
         },
         {
           provide: WinstonLoggerService,
-          useValue: {
-            log: jest.fn(),
-            error: jest.fn(),
-            warn: jest.fn(),
-            debug: jest.fn(),
-          },
+          useValue: loggerService,
+        },
+        {
+          provide: RedisService,
+          useValue: redisService,
         },
       ],
     }).compile();
@@ -65,7 +82,6 @@ describe('AdminUserService', () => {
       getRepositoryToken(AdminUserEntity, ConnectionNameEnum.READ_WRITE),
     );
 
-    // Reset mocks
     jest.clearAllMocks();
   });
 
@@ -152,6 +168,45 @@ describe('AdminUserService', () => {
       });
       expect(adminUserRepository.save).toHaveBeenCalledWith(newAdmin);
       expect(result).toEqual(newAdmin);
+    });
+  });
+
+  describe('cacheUserIds', () => {
+    it('should cache user IDs in Redis', async () => {
+      const adminId = 'admin-uuid';
+      const userIds = ['user-1', 'user-2', 'user-3'];
+
+      await service.cacheUserIds(adminId, userIds);
+
+      expect(redisService.set).toHaveBeenCalledWith(
+        `admin:${adminId}:userIds`,
+        userIds,
+      );
+    });
+  });
+
+  describe('getUserIds', () => {
+    it('should return cached user IDs from Redis', async () => {
+      const adminId = 'admin-uuid';
+      const userIds = ['user-1', 'user-2', 'user-3'];
+
+      redisService.get.mockResolvedValue(userIds);
+
+      const result = await service.getUserIds(adminId);
+
+      expect(redisService.get).toHaveBeenCalledWith(`admin:${adminId}:userIds`);
+      expect(result).toEqual(userIds);
+    });
+
+    it('should return empty array when no cached user IDs found', async () => {
+      const adminId = 'admin-uuid';
+
+      redisService.get.mockResolvedValue(null);
+
+      const result = await service.getUserIds(adminId);
+
+      expect(redisService.get).toHaveBeenCalledWith(`admin:${adminId}:userIds`);
+      expect(result).toEqual([]);
     });
   });
 });

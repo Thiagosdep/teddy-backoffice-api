@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
 export class AdminLoginDTO {
   @ApiProperty({
@@ -42,4 +42,18 @@ export class AdminCreateDTO {
   @IsNotEmpty()
   @IsString()
   password: string;
+}
+
+export class AdminUserIdsDTO {
+  @ApiProperty({
+    description: 'Array of user IDs to cache',
+    example: [
+      '123e4567-e89b-12d3-a456-426614174000',
+      '123e4567-e89b-12d3-a456-426614174001',
+    ],
+    type: [String],
+  })
+  @IsArray()
+  @IsUUID(4, { each: true })
+  userIds: string[];
 }

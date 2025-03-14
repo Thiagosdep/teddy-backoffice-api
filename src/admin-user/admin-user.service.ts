@@ -7,6 +7,7 @@ import { AdminLoginDTO } from './dtos/admin-user.controller.dto';
 import * as bcrypt from 'bcrypt';
 import { ConnectionNameEnum } from '../infrastructure/database/database.provider';
 import { WinstonLoggerService } from '../infrastructure/observability/logger/winston-logger.service';
+import { RedisService } from '../infrastructure/cache/redis/redis.service';
 
 @Injectable()
 export class AdminUserService {
@@ -15,6 +16,7 @@ export class AdminUserService {
     private adminUserWriteRepository: Repository<AdminUserEntity>,
     private jwtService: JwtService,
     private readonly logger: WinstonLoggerService,
+    private readonly redisService: RedisService,
   ) {}
 
   async validateAdmin(loginDto: AdminLoginDTO): Promise<string> {
@@ -72,5 +74,45 @@ export class AdminUserService {
       'AdminUserService',
     );
     return result;
+  }
+
+  async cacheUserIds(adminId: string, userIds: string[]): Promise<void> {
+    this.logger.log(
+      `Caching ${userIds.length} user IDs for admin ID=${adminId}`,
+      'AdminUserService',
+    );
+
+    const key = `admin:${adminId}:userIds`;
+    await this.redisService.set(key, userIds);
+
+    this.logger.log(
+      `Successfully cached user IDs for admin ID=${adminId}`,
+      'AdminUserService',
+    );
+  }
+
+  async getUserIds(adminId: string): Promise<string[]> {
+    this.logger.log(
+      `Retrieving cached user IDs for admin ID=${adminId}`,
+      'AdminUserService',
+    );
+
+    const key = `admin:${adminId}:userIds`;
+    const userIds = await this.redisService.get<string[]>(key);
+
+    if (!userIds) {
+      this.logger.log(
+        `No cached user IDs found for admin ID=${adminId}`,
+        'AdminUserService',
+      );
+      return [];
+    }
+
+    this.logger.log(
+      `Retrieved ${userIds.length} cached user IDs for admin ID=${adminId}`,
+      'AdminUserService',
+    );
+
+    return userIds;
   }
 }
