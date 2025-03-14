@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminUserService } from './admin-user.service';
 import { AdminUserController } from './admin-user.controller';
-import { AdminUserEntity } from './entities/admin-user.entity';
+import { AdminUserEntity } from './entities/AdminUser.entity';
 import { AuthModule } from '../auth/auth.module';
 import { ConnectionNameEnum } from '../infrastructure/database/database.provider';
 

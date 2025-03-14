@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AdminUserEntity } from './entities/admin-user.entity';
+import { AdminUserEntity } from './entities/AdminUser.entity';
 import { AdminLoginDTO } from './dtos/admin-user.controller.dto';
 import * as bcrypt from 'bcrypt';
 import { ConnectionNameEnum } from '../infrastructure/database/database.provider';

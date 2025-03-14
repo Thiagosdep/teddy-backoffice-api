@@ -1,4 +1,4 @@
-import { AdminUserEntity } from './admin-user.entity';
+import { AdminUserEntity } from './AdminUser.entity';
 
 describe('AdminUserEntity', () => {
   it('should create an instance of AdminUserEntity', () => {

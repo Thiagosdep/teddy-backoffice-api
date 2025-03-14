@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AdminUserService } from './admin-user.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { AdminUserEntity } from './entities/admin-user.entity';
+import { AdminUserEntity } from './entities/AdminUser.entity';
 import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException } from '@nestjs/common';
 import { AdminLoginDTO } from './dtos/admin-user.controller.dto';

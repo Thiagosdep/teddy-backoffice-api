@@ -1,99 +1,245 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🚀 Teddy Backoffice API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Uma aplicação backend moderna em NestJS para gerenciamento de operações de backoffice com TypeORM, PostgreSQL e autenticação JWT.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 📋 Estrutura do Projeto
 
-## Description
+### 🛠️ Tecnologias Utilizadas
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **[NestJS](https://nestjs.com/)** (v11) - Framework Node.js progressivo
+- **[TypeORM](https://typeorm.io/)** - ORM para TypeScript e JavaScript
+- **[PostgreSQL](https://www.postgresql.org/)** - Banco de dados relacional poderoso e de código aberto
+- **[JWT](https://jwt.io/)** - JSON Web Token para autenticação segura
+- **[Swagger](https://swagger.io/)** - Documentação de API
+- **[Jest](https://jestjs.io/)** - Framework de testes
 
-## Project setup
+### 📊 Diagrama de Relação entre Entidades
 
-```bash
-$ npm install
+```mermaid
+classDiagram
+    note "Entidades do Sistema"
+
+    AdminUserEntity <|-- UserEntity : "Admin gerencia"
+    UserEntity "1" -- "0..*" UserCompanyEntity : "possui"
+
+    class AdminUserEntity {
+        +string id
+        +string login
+        +string password
+    }
+
+    class UserEntity {
+        +string id
+        +string name
+        +string email
+        +number ownRemuneration
+        +Date createdAt
+        +Date updatedAt
+        +Date deletedAt
+        +UserCompanyEntity[] userCompanies
+        +createUser() : void
+        +updateUser() : void
+        +deleteUser() : void
+    }
+
+    class UserCompanyEntity {
+        +string id
+        +string name
+        +boolean active
+        +number companyValue
+        +string userId
+        +Date createdAt
+        +Date updatedAt
+        +Date deletedAt
+        +UserEntity user
+    }
 ```
 
-## Compile and run the project
+### 🏗️ Arquitetura e Princípios de Design
+
+- **Arquitetura Limpa** - Implementação de camadas bem definidas com separação clara de responsabilidades
+- **Injeção de Dependência** - Utilização do container DI nativo do NestJS para acoplamento fraco
+- **Padrão DTO** - Objetos de Transferência de Dados para validação robusta e segurança de tipos
+- **Padrão Repository** - Abstração elegante para operações de banco de dados
+- **Configuração Multi-ambiente** - Gerenciamento flexível de configurações via arquivos `.env`
+- **Sistema de Migração** - Controle de versão de banco de dados com migrações automatizadas
+- **Versionamento de API** - Estratégia de versionamento baseada em URI para evolução contínua
+- **Validação Global** - Sistema abrangente de validação usando class-validator
+- **Soft Delete** - Implementação de exclusão lógica para auditoria e recuperação de dados
+
+## 🐳 Implantação com Docker
+
+Nossa configuração Docker oferece um ambiente isolado e reproduzível para execução da aplicação.
+
+### Pré-requisitos
+
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Implantação Rápida
+
+1. **Clone o repositório**
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:dist
+git clone https://github.com/seu-usuario/teddy-backoffice-api.git
+cd teddy-backoffice-api
 ```
 
-## Run tests
+2. **Inicie a aplicação**
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+docker compose up
 ```
 
-## Deployment
+Este comando configura automaticamente:
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+- Contêiner da API com todas as dependências
+- Banco de dados PostgreSQL pré-configurado
+- Rede interna para comunicação segura entre serviços
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+> 💡 **Dica para Produção:** Use `docker-compose up -d` para execução em segundo plano.
+
+3. **Execute as migrações do banco de dados**
 
 ```bash
-$ npm install -g mau
-$ mau deploy
+docker exec teddy-backoffice-api npm run migration:run
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+4. **Acesse os recursos**
 
-## Resources
+- **API:** http://localhost:3000
+- **Documentação Swagger:** http://localhost:3000/swagger
 
-Check out a few resources that may come in handy when working with NestJS:
+## 💻 Executando Localmente (Sem Docker)
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Pré-requisitos
 
-## Support
+- [Node.js](https://nodejs.org/) (v20 ou posterior)
+- [npm](https://www.npmjs.com/)
+- [PostgreSQL](https://www.postgresql.org/) (v16 recomendado)
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Passos para Executar Localmente
 
-## Stay in touch
+1. **Clone o repositório**
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+git clone https://github.com/seu-usuario/teddy-backoffice-api.git
+cd teddy-backoffice-api
+```
 
-## License
+2. **Instale as dependências**
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+```bash
+npm install
+```
+
+3. **Configure as variáveis de ambiente**
+
+Crie um arquivo `.env` no diretório raiz baseado no arquivo `.env.example`:
+
+```bash
+cp .env.example .env
+```
+
+Atualize as configurações de conexão do banco de dados no `.env`:
+
+```
+DB_HOST_READ_WRITE=localhost
+DB_HOST_READ_ONLY=localhost
+DB_PORT=5432
+DB_DATABASE=teddy_core
+DB_USERNAME=seu_usuario_postgres
+DB_PASSWORD=sua_senha_postgres
+NODE_ENV=local
+
+JWT_SECRET=sua_chave_secreta
+JWT_EXPIRES_IN=1d
+```
+
+4. **Crie o banco de dados** (sugestão)
+
+```bash
+# Conecte ao PostgreSQL
+psql -U postgres
+
+# Crie o banco de dados e o usuário
+CREATE DATABASE teddy_core;
+CREATE USER teddy WITH ENCRYPTED PASSWORD 'password';
+GRANT ALL PRIVILEGES ON DATABASE teddy_core TO teddy;
+
+# Saia do PostgreSQL
+\q
+```
+
+> 💡 **Nota:** Este passo é apenas uma sugestão. Existem outros métodos para criar o banco de dados e o usuário.
+
+5. **Execute as migrações do banco de dados**
+
+```bash
+npm run migration:run
+```
+
+6. **Inicie a aplicação no modo de desenvolvimento**
+
+```bash
+npm run start:dev
+```
+
+7. **Acesse a API**
+
+A API estará disponível em http://localhost:3000
+
+8. **Acesse a documentação Swagger**
+
+A UI do Swagger está disponível em http://localhost:3000/swagger
+
+## 🔒 Autenticação
+
+A API usa JWT para autenticação. Rotas protegidas requerem um token JWT válido no cabeçalho Authorization:
+
+```
+Authorization: Bearer <seu_token_jwt>
+```
+
+Para obter um token, use o endpoint de login de administrador:
+
+```
+POST /admin/login
+{
+  "login": "admin",
+  "password": "password123"
+}
+```
+
+Para criar um usuário admin, você pode usar a seguinte rota:
+
+```
+POST /admin
+{
+  "login": "admin",
+  "password": "password123"
+}
+```
+
+> 💡 **Nota:** Esta rota foi liberada por se tratar de um repositório de teste, permitindo a criação de usuários admins para facilitar o desenvolvimento e testes.
+
+## 🧪 Executando Testes
+
+```bash
+# Testes unitários
+npm run test
+
+# Cobertura de testes
+npm run test:cov
+
+# TODO: Testes E2E
+npm run test:e2e
+```
+
+## 📝 Documentação da API
+
+Quando executada no modo de desenvolvimento ou local, a documentação Swagger está disponível em:
+
+```
+http://localhost:3000/swagger
+```

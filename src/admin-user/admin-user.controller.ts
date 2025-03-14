@@ -7,7 +7,7 @@ import {
   AdminLoginDTO,
 } from './dtos/admin-user.controller.dto';
 import { Public } from '../auth/decorators/public.decorator';
-import { AdminUserEntity } from './entities/admin-user.entity';
+import { AdminUserEntity } from './entities/AdminUser.entity';
 
 @ApiTags('admin')
 @Controller({ path: 'admins', version: '1' })
