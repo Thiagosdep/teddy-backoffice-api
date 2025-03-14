@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -100,5 +101,15 @@ export class UserController {
     @Body() user: UpdateUserDTO,
   ): Promise<void> {
     await this.userService.patchUpdate(id, user);
+  }
+
+  @Delete('/:id')
+  @ApiResponse({
+    status: 200,
+    description: 'User deleted successfully',
+  })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async delete(@Param('id') id: string): Promise<void> {
+    await this.userService.delete(id);
   }
 }

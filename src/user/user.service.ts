@@ -157,4 +157,18 @@ export class UserService {
       ]);
     });
   }
+
+  async delete(id: string): Promise<void> {
+    return this.dataSource.transaction(async (transactionalEntityManager) => {
+      const foundUser = await transactionalEntityManager.findOne(UserEntity, {
+        where: { id },
+      });
+
+      if (!foundUser) {
+        throw new NotFoundException('User not found');
+      }
+
+      await transactionalEntityManager.softDelete(UserEntity, id);
+    });
+  }
 }

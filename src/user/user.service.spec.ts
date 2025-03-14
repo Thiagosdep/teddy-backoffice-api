@@ -479,4 +479,33 @@ describe('UserService', () => {
       expect(mockEntityManager.save).toHaveBeenCalledWith(mockUser);
     });
   });
+
+  describe('delete', () => {
+    it('should delete a user successfully', async () => {
+      const userId = randomUUID();
+      const mockUser = new UserEntity({ id: userId });
+
+      const mockEntityManager = {
+        findOne: jest.fn().mockResolvedValue(mockUser),
+        softDelete: jest.fn().mockResolvedValue(undefined),
+      };
+
+      jest
+        .spyOn(dataSource, 'transaction')
+        .mockImplementation(async (cb: any) => {
+          return cb(mockEntityManager);
+        });
+
+      await userService.delete(userId);
+
+      expect(mockEntityManager.findOne).toHaveBeenCalledWith(UserEntity, {
+        where: { id: userId },
+      });
+
+      expect(mockEntityManager.softDelete).toHaveBeenCalledWith(
+        UserEntity,
+        userId,
+      );
+    });
+  });
 });

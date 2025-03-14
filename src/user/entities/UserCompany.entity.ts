@@ -13,7 +13,7 @@ import {
 @Entity({ name: 'user_companies' })
 export class UserCompanyEntity {
   constructor(partial: Partial<UserCompanyEntity>) {
-    const data = { ...partial, active: partial.active ?? true };
+    const data = { ...partial, active: partial?.active ?? true };
     Object.assign(this, data);
   }
 

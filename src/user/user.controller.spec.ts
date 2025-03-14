@@ -16,9 +16,9 @@ describe('UserController', () => {
     getAll: jest.Mock;
     create: jest.Mock;
     patchUpdate: jest.Mock;
+    delete: jest.Mock;
   };
 
-  // Test data
   const mockUserId = randomUUID();
   const mockUser = {
     id: mockUserId,
@@ -78,6 +78,7 @@ describe('UserController', () => {
       getAll: jest.fn(),
       create: jest.fn(),
       patchUpdate: jest.fn(),
+      delete: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -248,6 +249,26 @@ describe('UserController', () => {
         mockUserId,
         invalidUpdateDto,
       );
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete a user successfully', async () => {
+      userServiceMock.delete.mockResolvedValue(undefined);
+
+      await expect(controller.delete(mockUserId)).resolves.toBeUndefined();
+      expect(userServiceMock.delete).toHaveBeenCalledWith(mockUserId);
+    });
+
+    it('should throw an error if the user does not exist', async () => {
+      userServiceMock.delete.mockRejectedValue(
+        new NotFoundException('User not found'),
+      );
+
+      await expect(controller.delete(mockUserId)).rejects.toThrow(
+        'User not found',
+      );
+      expect(userServiceMock.delete).toHaveBeenCalledWith(mockUserId);
     });
   });
 });
