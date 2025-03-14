@@ -7,7 +7,6 @@ import { AdminUserEntity } from '../../admin-user/entities/admin-user.entity';
 
 export enum ConnectionNameEnum {
   READ_WRITE = 'READ_WRITE',
-  ONLY_READ = 'ONLY_READ',
 }
 
 export const databaseProviders = (
@@ -17,18 +16,8 @@ export const databaseProviders = (
     name: connectionName,
     imports: [AppConfigModule],
     useFactory: (appConfigService: AppConfigService) => {
-      const {
-        hostReadWrite,
-        hostOnlyRead,
-        port,
-        username,
-        password,
-        database,
-      } = appConfigService.database;
-      const host =
-        connectionName === ConnectionNameEnum.READ_WRITE
-          ? hostReadWrite
-          : hostOnlyRead;
+      const { host, port, username, password, database } =
+        appConfigService.database;
       return {
         name: connectionName,
         type: 'postgres',

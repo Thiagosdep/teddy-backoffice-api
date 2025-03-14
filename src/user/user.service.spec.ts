@@ -24,7 +24,10 @@ describe('UserService', () => {
       providers: [
         UserService,
         {
-          provide: getRepositoryToken(UserEntity, ConnectionNameEnum.ONLY_READ),
+          provide: getRepositoryToken(
+            UserEntity,
+            ConnectionNameEnum.READ_WRITE,
+          ),
           useValue: userReaderRepository,
         },
         {

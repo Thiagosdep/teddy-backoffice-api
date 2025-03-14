@@ -7,7 +7,6 @@ import { AuthModule } from '../auth/auth.module';
 import { ConnectionNameEnum } from '../infrastructure/database/database.provider';
 
 const typeOrmFeatureConfig = [
-  TypeOrmModule.forFeature([AdminUserEntity], ConnectionNameEnum.ONLY_READ),
   TypeOrmModule.forFeature([AdminUserEntity], ConnectionNameEnum.READ_WRITE),
 ];
 

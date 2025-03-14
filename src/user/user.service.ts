@@ -15,7 +15,7 @@ import { PaginationResponse } from '../common/types/pagination.type';
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(UserEntity, ConnectionNameEnum.ONLY_READ)
+    @InjectRepository(UserEntity, ConnectionNameEnum.READ_WRITE)
     private readonly userReaderRepository: Repository<UserEntity>,
     @InjectDataSource(ConnectionNameEnum.READ_WRITE)
     private readonly dataSource: DataSource,

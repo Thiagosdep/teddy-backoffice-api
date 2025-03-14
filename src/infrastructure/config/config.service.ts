@@ -8,8 +8,7 @@ export class AppConfigService {
 
   get database(): DatabaseConfig {
     return {
-      hostOnlyRead: this.configService.get<string>('database.hostOnlyRead'),
-      hostReadWrite: this.configService.get<string>('database.hostReadWrite'),
+      host: this.configService.get<string>('database.host'),
       port: this.configService.get<number>('database.port'),
       username: this.configService.get<string>('database.username'),
       password: this.configService.get<string>('database.password'),

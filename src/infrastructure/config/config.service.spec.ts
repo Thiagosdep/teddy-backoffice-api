@@ -14,8 +14,7 @@ describe('AppConfigService', () => {
           useValue: {
             get: jest.fn((key: string) => {
               const config = {
-                'database.hostOnlyRead': 'localhost',
-                'database.hostReadWrite': 'localhost',
+                'database.host': 'localhost',
                 'database.port': 5432,
                 'database.username': 'user',
                 'database.password': 'pass',
@@ -39,8 +38,7 @@ describe('AppConfigService', () => {
 
   it('should return database configuration', () => {
     const dbConfig = service.database;
-    expect(dbConfig.hostOnlyRead).toBe('localhost');
-    expect(dbConfig.hostReadWrite).toBe('localhost');
+    expect(dbConfig.host).toBe('localhost');
     expect(dbConfig.port).toBe(5432);
     expect(dbConfig.username).toBe('user');
     expect(dbConfig.password).toBe('pass');

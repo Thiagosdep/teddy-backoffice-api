@@ -18,7 +18,6 @@ import { AuthModule } from './auth/auth.module';
   imports: [
     LoggerModule,
     UserModule,
-    TypeOrmModule.forRootAsync(databaseProviders(ConnectionNameEnum.ONLY_READ)),
     TypeOrmModule.forRootAsync(
       databaseProviders(ConnectionNameEnum.READ_WRITE),
     ),
