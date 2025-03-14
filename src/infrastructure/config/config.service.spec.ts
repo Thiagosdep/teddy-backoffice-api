@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { AppConfigService } from './config.service';
@@ -21,6 +20,8 @@ describe('AppConfigService', () => {
                 'database.username': 'user',
                 'database.password': 'pass',
                 'database.database': 'test_db',
+                'jwt.secret': 'secret',
+                'jwt.expiresIn': '1d',
               };
               return config[key];
             }),

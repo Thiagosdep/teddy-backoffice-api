@@ -4,7 +4,7 @@ import { AdminUserService } from './admin-user.service';
 import { AdminUserController } from './admin-user.controller';
 import { AdminUserEntity } from './entities/admin-user.entity';
 import { AuthModule } from '../auth/auth.module';
-import { ConnectionNameEnum } from 'src/infrastructure/database/database.provider';
+import { ConnectionNameEnum } from '../infrastructure/database/database.provider';
 
 const typeOrmFeatureConfig = [
   TypeOrmModule.forFeature([AdminUserEntity], ConnectionNameEnum.ONLY_READ),
