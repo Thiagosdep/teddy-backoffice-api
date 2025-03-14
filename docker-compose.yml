@@ -76,14 +76,6 @@ services:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
 
-  jaeger:
-    image: jaegertracing/all-in-one:latest
-    container_name: teddy-jaeger
-    ports:
-      - "16686:16686"  # UI
-      - "14268:14268"  # Collector HTTP
-      - "6831:6831/udp"  # Collector UDP
-
   redis:
     image: redis:alpine
     container_name: teddy-redis

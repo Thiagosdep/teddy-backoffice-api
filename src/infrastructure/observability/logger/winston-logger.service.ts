@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as winston from 'winston';
-import LokiTransport from 'winston-loki';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const LokiTransport = require('winston-loki');
 
 @Injectable()
 export class WinstonLoggerService {
@@ -16,7 +17,7 @@ export class WinstonLoggerService {
       }),
     ];
 
-    const lokiUrl = process.env.LOKI_URL || ' http://loki:3100';
+    const lokiUrl = process.env.LOKI_URL || 'http://loki:3100';
     try {
       transports.push(
         new LokiTransport({

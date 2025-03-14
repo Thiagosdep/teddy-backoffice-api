@@ -248,7 +248,7 @@ export class UserService {
 
   async getBatch(ids: string[]): Promise<UserEntity[]> {
     this.logger.log(
-      `Fetching batch of users with ids=${ids.join(', ')}`,
+      `Fetching batch of users with ids=${ids.toString()}`,
       'UserService',
     );
 
@@ -266,7 +266,7 @@ export class UserService {
       const foundIds = users.map((user) => user.id);
       const missingIds = ids.filter((id) => !foundIds.includes(id));
       this.logger.error(
-        `Some users not found: ${missingIds.join(', ')}`,
+        `Some users not found: ${missingIds.toString()}`,
         undefined,
         'UserService',
       );

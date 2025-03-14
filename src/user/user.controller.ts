@@ -19,6 +19,7 @@ import { UserAdapter } from './adapters/user.adapter';
 import { PaginationResponse } from '../common/types/pagination.type';
 import { validatePaginationQuery } from '../common/types/pagination.type';
 import { WinstonLoggerService } from '../infrastructure/observability/logger/winston-logger.service';
+import { UserEntity } from './entities/User.entity';
 
 @ApiTags('users')
 @Controller({ path: 'users', version: '1' })
@@ -146,45 +147,19 @@ export class UserController {
     );
   }
 
-  @Get('/batch')
-  @ApiResponse({
-    status: 200,
-    description: 'Users retrieved successfully',
-    isArray: true,
-    type: UserDTO,
-  })
-  @ApiResponse({ status: 404, description: 'One or more users not found' })
-  async getBatch(@Query('ids') ids: string[]): Promise<UserDTO[]> {
-    this.logger.log(
-      `Getting batch of users with ids=${ids.join(', ')}`,
-      'UserController',
-    );
-
-    const users = await this.userService.getBatch(ids);
-
-    this.logger.log(
-      `Retrieved ${users.length} users in batch request`,
-      'UserController',
-    );
-
-    return users.map((user) => UserAdapter.toUserDTO(user));
-  }
-
   @Post('/batch')
   @ApiResponse({
     status: 201,
     description: 'Users created successfully',
   })
   @ApiResponse({ status: 400, description: 'Bad request' })
-  async createBatch(@Body() userIds: string[]): Promise<void> {
+  async createBatch(
+    @Body() body: { userIds: string[] },
+  ): Promise<UserEntity[]> {
     this.logger.log(
-      `Getting batch of users with ids=${userIds.join(', ')}`,
+      `Getting batch of users with ids=${body.userIds.toString()}`,
       'UserController',
     );
-    await this.userService.getBatch(userIds);
-    this.logger.log(
-      `Users created successfully with ids=${userIds.join(', ')}`,
-      'UserController',
-    );
+    return this.userService.getBatch(body.userIds);
   }
 }

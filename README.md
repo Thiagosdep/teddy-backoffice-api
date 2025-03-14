@@ -16,7 +16,6 @@ Uma aplicação backend moderna em NestJS para gerenciamento de operações de b
 - **[Loki](https://grafana.com/oss/loki/)** - Sistema de agregação de logs
 - **[Prometheus](https://prometheus.io/)** - Sistema de monitoramento e alerta
 - **[Grafana](https://grafana.com/)** - Plataforma de visualização e análise
-- **[Jaeger](https://www.jaegertracing.io/)** - Sistema de rastreamento distribuído
 
 ### 📊 Diagrama de Relação entre Entidades
 
@@ -93,13 +92,6 @@ O projeto implementa uma stack completa de observabilidade que inclui:
 - Endpoint `/metrics` para coleta pelo Prometheus
 - Dashboards no Grafana para visualização
 
-### 🔍 Rastreamento (Jaeger)
-
-- Rastreamento de requisições HTTP
-- Visualização de traces no Jaeger UI
-- Análise de latência e gargalos
-- Correlação entre serviços
-
 ## 🐳 Implantação com Docker
 
 Nossa configuração Docker oferece um ambiente isolado e reproduzível para execução da aplicação, incluindo toda a stack de observabilidade.
@@ -112,7 +104,6 @@ Após iniciar os contêineres com `docker compose up`, você pode acessar:
 - **Documentação Swagger:** http://localhost:4000/swagger
 - **Grafana:** http://localhost:3001 (usuário: admin, senha: admin)
 - **Prometheus:** http://localhost:9090
-- **Jaeger UI:** http://localhost:16686
 
 ### Configurando o Grafana
 
