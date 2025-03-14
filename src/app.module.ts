@@ -11,6 +11,8 @@ import {
   databaseProviders,
 } from './infrastructure/database/database.provider';
 import { AppConfigModule } from './infrastructure/config/config.module';
+import { AdminUserModule } from './admin-user/admin-user.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { AppConfigModule } from './infrastructure/config/config.module';
       databaseProviders(ConnectionNameEnum.READ_WRITE),
     ),
     AppConfigModule,
+    AdminUserModule,
+    AuthModule,
   ],
   controllers: [AppController, UserController],
   providers: [AppService, UserService],

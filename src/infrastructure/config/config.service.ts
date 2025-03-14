@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseConfig } from './config.interface';
+import { DatabaseConfig, JwtConfig } from './config.interface';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -15,5 +15,12 @@ export class AppConfigService {
       password: this.configService.get<string>('database.password'),
       database: this.configService.get<string>('database.database'),
     } as DatabaseConfig;
+  }
+
+  get jwt(): JwtConfig {
+    return {
+      secret: this.configService.get<string>('jwt.secret'),
+      expiresIn: this.configService.get<string>('jwt.expiresIn'),
+    } as JwtConfig;
   }
 }

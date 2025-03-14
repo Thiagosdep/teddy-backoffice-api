@@ -6,3 +6,8 @@ export interface DatabaseConfig {
   password: string;
   database: string;
 }
+
+export interface JwtConfig {
+  secret: string;
+  expiresIn: string;
+}

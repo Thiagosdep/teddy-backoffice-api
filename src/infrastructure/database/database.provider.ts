@@ -3,6 +3,8 @@ import { AppConfigModule } from '../config/config.module';
 import { AppConfigService } from '../config/config.service';
 import { UserEntity } from '../../user/entities/User.entity';
 import { UserCompanyEntity } from '../../user/entities/UserCompany.entity';
+import { AdminUserEntity } from '../../admin-user/entities/admin-user.entity';
+
 export enum ConnectionNameEnum {
   READ_WRITE = 'READ_WRITE',
   ONLY_READ = 'ONLY_READ',
@@ -35,7 +37,7 @@ export const databaseProviders = (
         username,
         password,
         database,
-        entities: [UserEntity, UserCompanyEntity],
+        entities: [UserEntity, UserCompanyEntity, AdminUserEntity],
         synchronize: false,
         logging: false,
       };

@@ -45,4 +45,10 @@ describe('AppConfigService', () => {
     expect(dbConfig.password).toBe('pass');
     expect(dbConfig.database).toBe('test_db');
   });
+
+  it('should return JWT configuration', () => {
+    const jwtConfig = service.jwt;
+    expect(jwtConfig.secret).toBe('secret');
+    expect(jwtConfig.expiresIn).toBe('1d');
+  });
 });
