@@ -1,0 +1,104 @@
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
+import { ApiTags, ApiResponse, ApiParam } from '@nestjs/swagger';
+import {
+  CreateUserDTO,
+  UpdateUserDTO,
+  UserDTO,
+} from './dtos/user.controller.dto';
+import { UserService } from './user.service';
+import { UserAdapter } from './adapters/user.adapter';
+import { PaginationResponse } from '../common/types/pagination.type';
+import { validatePaginationQuery } from '../common/types/pagination.type';
+
+@ApiTags('users')
+@Controller({ path: 'users', version: '1' })
+@ApiResponse({ status: 500, description: 'Internal server error' })
+export class UserController {
+  constructor(private readonly userService: UserService) {}
+
+  @Get()
+  @ApiResponse({
+    status: 200,
+    description: 'Users retrieved successfully',
+    isArray: true,
+    type: UserDTO,
+  })
+  @ApiResponse({ status: 404, description: 'Out of bounds' })
+  async getAll(
+    @Query('offset') offset: number,
+    @Query('limit') limit: number,
+  ): Promise<PaginationResponse<UserDTO>> {
+    const { validatedLimit, validatedOffset } = validatePaginationQuery(
+      limit,
+      offset,
+    );
+
+    const response = await this.userService.getAll({
+      limit: validatedLimit,
+      offset: validatedOffset,
+    });
+
+    return {
+      data: response.data.map((user) => UserAdapter.toUserDTO(user)),
+      total: response.total,
+      offset: response.offset,
+      limit: response.limit,
+    };
+  }
+
+  @Get('/:id')
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'The id of the user to retrieve',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User retrieved successfully',
+    type: UserDTO,
+  })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async get(@Param('id') id: string): Promise<UserDTO> {
+    const user = await this.userService.get(id);
+    return UserAdapter.toUserDTO(user);
+  }
+
+  @Post()
+  @ApiResponse({
+    status: 201,
+    description: 'User created successfully',
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 409, description: 'User already exists' })
+  async create(@Body() user: CreateUserDTO): Promise<void> {
+    await this.userService.create(user);
+  }
+
+  @Patch('/:id')
+  @ApiResponse({
+    status: 200,
+    description: 'User updated successfully',
+  })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 409, description: 'Email already in use' })
+  @ApiResponse({
+    status: 400,
+    description: 'company_id is required for update',
+  })
+  async update(
+    @Param('id') id: string,
+    @Body() user: UpdateUserDTO,
+  ): Promise<void> {
+    await this.userService.patchUpdate(id, user);
+  }
+}
