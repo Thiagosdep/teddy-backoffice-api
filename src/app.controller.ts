@@ -1,14 +1,14 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
-import { AppLogger } from './infrastructure/logger/logger.service';
+import { WinstonLoggerService } from './infrastructure/observability/logger/winston-logger.service';
 
 @ApiTags('healthcheck')
-@Controller({ version: '1' })
+@Controller({ path: 'healthcheck', version: '1' })
 export class AppController {
   constructor(
     private readonly appService: AppService,
-    private readonly appLogger: AppLogger,
+    private readonly logger: WinstonLoggerService,
   ) {}
 
   @Get()
@@ -18,9 +18,14 @@ export class AppController {
   })
   healthCheck(): string {
     try {
+      this.logger.log('Health check requested', 'AppController');
       return this.appService.healthCheck();
     } catch (error) {
-      this.appLogger.error('Error on healthcheck', JSON.stringify(error));
+      this.logger.error(
+        'Error on healthcheck',
+        JSON.stringify(error),
+        'AppController',
+      );
       return this.appService.healthCheckDown();
     }
   }

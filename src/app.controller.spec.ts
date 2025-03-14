@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppLogger } from './infrastructure/logger/logger.service';
+import { WinstonLoggerService } from './infrastructure/observability/logger/winston-logger.service';
 
 describe('AppController', () => {
   let appController: AppController;
@@ -9,7 +10,19 @@ describe('AppController', () => {
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
-      providers: [AppService, AppLogger],
+      providers: [
+        AppService,
+        AppLogger,
+        {
+          provide: WinstonLoggerService,
+          useValue: {
+            log: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     appController = app.get<AppController>(AppController);

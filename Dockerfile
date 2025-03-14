@@ -6,12 +6,12 @@ RUN apk add --no-cache postgresql-client
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm install --no-optional --legacy-peer-deps
 
 COPY . .
 
 RUN npm run build
 
-EXPOSE 3000
+EXPOSE 4000
 
 CMD ["sh", "-c", "npm run start:dist"]

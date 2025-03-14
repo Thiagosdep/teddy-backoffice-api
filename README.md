@@ -1,6 +1,6 @@
 # 🚀 Teddy Backoffice API
 
-Uma aplicação backend moderna em NestJS para gerenciamento de operações de backoffice com TypeORM, PostgreSQL e autenticação JWT.
+Uma aplicação backend moderna em NestJS para gerenciamento de operações de backoffice com TypeORM, PostgreSQL, autenticação JWT e observabilidade completa.
 
 ## 📋 Estrutura do Projeto
 
@@ -12,6 +12,11 @@ Uma aplicação backend moderna em NestJS para gerenciamento de operações de b
 - **[JWT](https://jwt.io/)** - JSON Web Token para autenticação segura
 - **[Swagger](https://swagger.io/)** - Documentação de API
 - **[Jest](https://jestjs.io/)** - Framework de testes
+- **[Winston](https://github.com/winstonjs/winston)** - Biblioteca de logging
+- **[Loki](https://grafana.com/oss/loki/)** - Sistema de agregação de logs
+- **[Prometheus](https://prometheus.io/)** - Sistema de monitoramento e alerta
+- **[Grafana](https://grafana.com/)** - Plataforma de visualização e análise
+- **[Jaeger](https://www.jaegertracing.io/)** - Sistema de rastreamento distribuído
 
 ### 📊 Diagrama de Relação entre Entidades
 
@@ -37,9 +42,6 @@ classDiagram
         +Date updatedAt
         +Date deletedAt
         +UserCompanyEntity[] userCompanies
-        +createUser() : void
-        +updateUser() : void
-        +deleteUser() : void
     }
 
     class UserCompanyEntity {
@@ -66,132 +68,99 @@ classDiagram
 - **Versionamento de API** - Estratégia de versionamento baseada em URI para evolução contínua
 - **Validação Global** - Sistema abrangente de validação usando class-validator
 - **Soft Delete** - Implementação de exclusão lógica para auditoria e recuperação de dados
+- **Observabilidade Completa** - Logs estruturados, métricas e rastreamento distribuído
+
+## 📊 Observabilidade
+
+O projeto implementa uma stack completa de observabilidade que inclui:
+
+### 📝 Logging (Winston + Loki)
+
+- Logs estruturados em JSON
+- Integração com Loki para armazenamento e consulta de logs
+- Visualização de logs no Grafana
+- Níveis de log configuráveis (info, warn, error, debug)
+- Contexto de logs para facilitar a depuração
+
+### 📈 Métricas (Prometheus)
+
+- Métricas padrão do sistema (CPU, memória, etc.)
+- Métricas personalizadas de aplicação:
+  - Contagem total de requisições HTTP
+  - Duração das requisições
+  - Requisições em andamento
+  - Contagem de erros
+- Endpoint `/metrics` para coleta pelo Prometheus
+- Dashboards no Grafana para visualização
+
+### 🔍 Rastreamento (Jaeger)
+
+- Rastreamento de requisições HTTP
+- Visualização de traces no Jaeger UI
+- Análise de latência e gargalos
+- Correlação entre serviços
 
 ## 🐳 Implantação com Docker
 
-Nossa configuração Docker oferece um ambiente isolado e reproduzível para execução da aplicação.
+Nossa configuração Docker oferece um ambiente isolado e reproduzível para execução da aplicação, incluindo toda a stack de observabilidade.
 
-### Pré-requisitos
+### Recursos Disponíveis
 
-- [Docker](https://www.docker.com/get-started)
-- [Docker Compose](https://docs.docker.com/compose/install/)
+Após iniciar os contêineres com `docker compose up`, você pode acessar:
 
-### Implantação Rápida
+- **API:** http://localhost:4000
+- **Documentação Swagger:** http://localhost:4000/swagger
+- **Grafana:** http://localhost:3001 (usuário: admin, senha: admin)
+- **Prometheus:** http://localhost:9090
+- **Jaeger UI:** http://localhost:16686
 
-1. **Clone o repositório**
+### Configurando o Grafana
 
-```bash
-git clone https://github.com/seu-usuario/teddy-backoffice-api.git
-cd teddy-backoffice-api
-```
+Após iniciar os contêineres, você pode configurar dashboards no Grafana:
 
-2. **Inicie a aplicação**
+1. Acesse http://localhost:3001 e faça login com usuário `admin` e senha `admin`
+2. Vá para "Dashboards" > "New" > "New Dashboard"
+3. Adicione painéis usando as fontes de dados Prometheus e Loki
 
-```bash
-docker compose up
-```
+#### Exemplos de consultas Prometheus:
 
-Este comando configura automaticamente:
+- Total de requisições: `http_requests_total`
+- Duração média das requisições: `rate(http_request_duration_seconds_sum[5m]) / rate(http_request_duration_seconds_count[5m])`
+- Requisições por segundo: `rate(http_requests_total[1m])`
+- Taxa de erros: `rate(http_request_errors_total[5m])`
 
-- Contêiner da API com todas as dependências
-- Banco de dados PostgreSQL pré-configurado
-- Rede interna para comunicação segura entre serviços
+#### Exemplos de consultas Loki:
 
-> 💡 **Dica para Produção:** Use `docker-compose up -d` para execução em segundo plano.
+- Todos os logs: `{app="teddy-backoffice-api"}`
+- Logs de erro: `{app="teddy-backoffice-api"} |= "error"`
+- Logs de um serviço específico: `{app="teddy-backoffice-api", context="UserService"}`
+- Logs de requisições HTTP: `{app="teddy-backoffice-api", context="HttpRequest"}`
 
-3. **Execute as migrações do banco de dados**
+## 🔍 Monitoramento e Depuração
 
-```bash
-docker exec teddy-backoffice-api npm run migration:run
-```
+### Visualizando Logs
 
-4. **Acesse os recursos**
+Os logs são enviados para o console e para o Loki. Para visualizar os logs:
 
-- **API:** http://localhost:3000
-- **Documentação Swagger:** http://localhost:3000/swagger
+1. **Console:** Visíveis diretamente no terminal onde a aplicação está sendo executada
+2. **Grafana:** Acesse http://localhost:3001, vá para "Explore" e selecione a fonte de dados "Loki"
 
-## 💻 Executando Localmente (Sem Docker)
+### Monitorando Métricas
 
-### Pré-requisitos
+As métricas da aplicação podem ser visualizadas de várias formas:
 
-- [Node.js](https://nodejs.org/) (v20 ou posterior)
-- [npm](https://www.npmjs.com/)
-- [PostgreSQL](https://www.postgresql.org/) (v16 recomendado)
+1. **Endpoint de Métricas:** Acesse http://localhost:4000/metrics para ver as métricas brutas
+2. **Prometheus:** Acesse http://localhost:9090 para consultar e visualizar métricas
+3. **Grafana:** Acesse http://localhost:3001 para visualizar dashboards com métricas
 
-### Passos para Executar Localmente
+### Analisando Traces
 
-1. **Clone o repositório**
+Para visualizar e analisar traces de requisições:
 
-```bash
-git clone https://github.com/seu-usuario/teddy-backoffice-api.git
-cd teddy-backoffice-api
-```
-
-2. **Instale as dependências**
-
-```bash
-npm install
-```
-
-3. **Configure as variáveis de ambiente**
-
-Crie um arquivo `.env` no diretório raiz baseado no arquivo `.env.example`:
-
-```bash
-cp .env.example .env
-```
-
-Atualize as configurações de conexão do banco de dados no `.env`:
-
-```
-DB_HOST_READ_WRITE=localhost
-DB_HOST_READ_ONLY=localhost
-DB_PORT=5432
-DB_DATABASE=teddy_core
-DB_USERNAME=seu_usuario_postgres
-DB_PASSWORD=sua_senha_postgres
-NODE_ENV=local
-
-JWT_SECRET=sua_chave_secreta
-JWT_EXPIRES_IN=1d
-```
-
-4. **Crie o banco de dados** (sugestão)
-
-```bash
-# Conecte ao PostgreSQL
-psql -U postgres
-
-# Crie o banco de dados e o usuário
-CREATE DATABASE teddy_core;
-CREATE USER teddy WITH ENCRYPTED PASSWORD 'password';
-GRANT ALL PRIVILEGES ON DATABASE teddy_core TO teddy;
-
-# Saia do PostgreSQL
-\q
-```
-
-> 💡 **Nota:** Este passo é apenas uma sugestão. Existem outros métodos para criar o banco de dados e o usuário.
-
-5. **Execute as migrações do banco de dados**
-
-```bash
-npm run migration:run
-```
-
-6. **Inicie a aplicação no modo de desenvolvimento**
-
-```bash
-npm run start:dev
-```
-
-7. **Acesse a API**
-
-A API estará disponível em http://localhost:3000
-
-8. **Acesse a documentação Swagger**
-
-A UI do Swagger está disponível em http://localhost:3000/swagger
+1. Acesse a UI do Jaeger em http://localhost:16686
+2. Selecione o serviço "teddy-backoffice-api" no menu suspenso
+3. Defina os filtros desejados e clique em "Find Traces"
+4. Clique em um trace para ver detalhes e spans individuais
 
 ## 🔒 Autenticação
 
@@ -204,7 +173,7 @@ Authorization: Bearer <seu_token_jwt>
 Para obter um token, use o endpoint de login de administrador:
 
 ```
-POST /admin/login
+POST /admin/auth
 {
   "login": "admin",
   "password": "password123"
@@ -241,5 +210,5 @@ npm run test:e2e
 Quando executada no modo de desenvolvimento ou local, a documentação Swagger está disponível em:
 
 ```
-http://localhost:3000/swagger
+http://localhost:4000/swagger
 ```

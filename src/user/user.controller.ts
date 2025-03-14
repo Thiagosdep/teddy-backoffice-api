@@ -18,12 +18,16 @@ import { UserService } from './user.service';
 import { UserAdapter } from './adapters/user.adapter';
 import { PaginationResponse } from '../common/types/pagination.type';
 import { validatePaginationQuery } from '../common/types/pagination.type';
+import { WinstonLoggerService } from '../infrastructure/observability/logger/winston-logger.service';
 
 @ApiTags('users')
 @Controller({ path: 'users', version: '1' })
 @ApiResponse({ status: 500, description: 'Internal server error' })
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly logger: WinstonLoggerService,
+  ) {}
 
   @Get()
   @ApiResponse({
@@ -37,6 +41,11 @@ export class UserController {
     @Query('offset') offset: number,
     @Query('limit') limit: number,
   ): Promise<PaginationResponse<UserDTO>> {
+    this.logger.log(
+      `Getting all users with offset=${offset}, limit=${limit}`,
+      'UserController',
+    );
+
     const { validatedLimit, validatedOffset } = validatePaginationQuery(
       limit,
       offset,
@@ -46,6 +55,11 @@ export class UserController {
       limit: validatedLimit,
       offset: validatedOffset,
     });
+
+    this.logger.log(
+      `Retrieved ${response.data.length} users`,
+      'UserController',
+    );
 
     return {
       data: response.data.map((user) => UserAdapter.toUserDTO(user)),
@@ -69,6 +83,7 @@ export class UserController {
   })
   @ApiResponse({ status: 404, description: 'User not found' })
   async get(@Param('id') id: string): Promise<UserDTO> {
+    this.logger.log(`Getting user with id=${id}`, 'UserController');
     const user = await this.userService.get(id);
     return UserAdapter.toUserDTO(user);
   }
@@ -81,7 +96,15 @@ export class UserController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 409, description: 'User already exists' })
   async create(@Body() user: CreateUserDTO): Promise<void> {
+    this.logger.log(
+      `Creating new user with email=${user.email}`,
+      'UserController',
+    );
     await this.userService.create(user);
+    this.logger.log(
+      `User created successfully with email=${user.email}`,
+      'UserController',
+    );
   }
 
   @Patch('/:id')
@@ -100,7 +123,12 @@ export class UserController {
     @Param('id') id: string,
     @Body() user: UpdateUserDTO,
   ): Promise<void> {
+    this.logger.log(`Updating user with id=${id}`, 'UserController');
     await this.userService.patchUpdate(id, user);
+    this.logger.log(
+      `User updated successfully with id=${id}`,
+      'UserController',
+    );
   }
 
   @Delete('/:id')
@@ -110,6 +138,11 @@ export class UserController {
   })
   @ApiResponse({ status: 404, description: 'User not found' })
   async delete(@Param('id') id: string): Promise<void> {
+    this.logger.log(`Deleting user with id=${id}`, 'UserController');
     await this.userService.delete(id);
+    this.logger.log(
+      `User deleted successfully with id=${id}`,
+      'UserController',
+    );
   }
 }

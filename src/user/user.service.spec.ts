@@ -9,6 +9,7 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { UpdateUserDTO } from './dtos/user.controller.dto';
 import { ConnectionNameEnum } from '../infrastructure/database/database.provider';
 import { getDataSourceToken, getRepositoryToken } from '@nestjs/typeorm';
+import { WinstonLoggerService } from '../infrastructure/observability/logger/winston-logger.service';
 
 describe('UserService', () => {
   const date = new Date();
@@ -33,6 +34,15 @@ describe('UserService', () => {
         {
           provide: getDataSourceToken(ConnectionNameEnum.READ_WRITE),
           useValue: dataSource,
+        },
+        {
+          provide: WinstonLoggerService,
+          useValue: {
+            log: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+          },
         },
       ],
     }).compile();

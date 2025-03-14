@@ -3,11 +3,15 @@ import { AppModule } from './app.module';
 import { VersioningType } from '@nestjs/common';
 import { setupAppWithSwagger } from './infrastructure/swagger/config';
 import { validationPipe } from './infrastructure/pipe/validation.pipe';
+import { WinstonLoggerService } from './infrastructure/observability/logger/winston-logger.service';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule, {
     cors: true,
   });
+
+  const logger = app.get(WinstonLoggerService);
+  app.useLogger(logger);
 
   app.useGlobalPipes(validationPipe);
 
@@ -23,7 +27,12 @@ async function bootstrap(): Promise<void> {
     setupAppWithSwagger(app);
   }
 
-  await app.listen(process.env.PORT ?? 3000);
+  const port = process.env.PORT ?? 4000;
+  await app.listen(port);
+  logger.log(
+    `Application is running on: http://localhost:${port}`,
+    'Bootstrap',
+  );
 }
 
 bootstrap().catch((err) => console.error(err));

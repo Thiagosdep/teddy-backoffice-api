@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './entities/User.entity';
 import { ConnectionNameEnum } from '../infrastructure/database/database.provider';
 import { UserCompanyEntity } from './entities/UserCompany.entity';
+import { ObservabilityModule } from '../infrastructure/observability/observability.module';
 
 const typeOrmFeatureConfig = [
   TypeOrmModule.forFeature(
@@ -13,7 +14,7 @@ const typeOrmFeatureConfig = [
   ),
 ];
 @Module({
-  imports: [...typeOrmFeatureConfig],
+  imports: [...typeOrmFeatureConfig, ObservabilityModule],
   controllers: [UserController],
   exports: [UserService, ...typeOrmFeatureConfig],
   providers: [UserService],

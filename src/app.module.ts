@@ -13,6 +13,7 @@ import {
 import { AppConfigModule } from './infrastructure/config/config.module';
 import { AdminUserModule } from './admin-user/admin-user.module';
 import { AuthModule } from './auth/auth.module';
+import { ObservabilityModule } from './infrastructure/observability/observability.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AuthModule } from './auth/auth.module';
     AppConfigModule,
     AdminUserModule,
     AuthModule,
+    ObservabilityModule,
   ],
   controllers: [AppController, UserController],
   providers: [AppService, UserService],

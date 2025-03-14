@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
@@ -8,6 +7,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { randomUUID } from 'crypto';
+import { WinstonLoggerService } from '../infrastructure/observability/logger/winston-logger.service';
 
 describe('UserController', () => {
   let controller: UserController;
@@ -87,6 +87,15 @@ describe('UserController', () => {
         {
           provide: UserService,
           useValue: userServiceMock,
+        },
+        {
+          provide: WinstonLoggerService,
+          useValue: {
+            log: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+          },
         },
       ],
     }).compile();

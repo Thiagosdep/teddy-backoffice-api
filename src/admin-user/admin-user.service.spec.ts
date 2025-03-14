@@ -7,6 +7,13 @@ import { UnauthorizedException } from '@nestjs/common';
 import { AdminLoginDTO } from './dtos/admin-user.controller.dto';
 import * as bcrypt from 'bcrypt';
 import { ConnectionNameEnum } from '../infrastructure/database/database.provider';
+import { WinstonLoggerService } from '../infrastructure/observability/logger/winston-logger.service';
+
+// Mock bcrypt
+jest.mock('bcrypt', () => ({
+  compare: jest.fn(),
+  hash: jest.fn(),
+}));
 
 describe('AdminUserService', () => {
   let service: AdminUserService;
@@ -40,6 +47,15 @@ describe('AdminUserService', () => {
             save: jest.fn(),
           },
         },
+        {
+          provide: WinstonLoggerService,
+          useValue: {
+            log: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -48,6 +64,9 @@ describe('AdminUserService', () => {
     adminUserRepository = module.get(
       getRepositoryToken(AdminUserEntity, ConnectionNameEnum.READ_WRITE),
     );
+
+    // Reset mocks
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -119,9 +138,8 @@ describe('AdminUserService', () => {
       const hashedPassword = 'hashedNewPassword';
       const newAdmin = { id: 'new-uuid', login, password: hashedPassword };
 
-      jest
-        .spyOn(bcrypt, 'hash')
-        .mockImplementation(() => Promise.resolve(hashedPassword));
+      (bcrypt.hash as jest.Mock).mockResolvedValue(hashedPassword);
+
       adminUserRepository.create.mockReturnValue(newAdmin);
       adminUserRepository.save.mockResolvedValue(newAdmin);
 

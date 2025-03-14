@@ -7,7 +7,7 @@ export class CreateAdminUserTable1741944600838 implements MigrationInterface {
       await queryRunner.query(`
                   CREATE TABLE IF NOT EXISTS admin_users (
                     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                    login VARCHAR NOT NULL,
+                    login VARCHAR UNIQUE NOT NULL,
                     password VARCHAR NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,

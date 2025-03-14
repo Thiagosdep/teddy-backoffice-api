@@ -5,6 +5,7 @@ import {
   AdminCreateDTO,
   AdminLoginDTO,
 } from './dtos/admin-user.controller.dto';
+import { WinstonLoggerService } from '../infrastructure/observability/logger/winston-logger.service';
 
 describe('AdminUserController', () => {
   let controller: AdminUserController;
@@ -23,8 +24,17 @@ describe('AdminUserController', () => {
         {
           provide: AdminUserService,
           useValue: {
-            create: jest.fn(),
-            validateAdmin: jest.fn(),
+            create: jest.fn().mockResolvedValue(mockAdminUser),
+            validateAdmin: jest.fn().mockResolvedValue('jwt-token'),
+          },
+        },
+        {
+          provide: WinstonLoggerService,
+          useValue: {
+            log: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
           },
         },
       ],
