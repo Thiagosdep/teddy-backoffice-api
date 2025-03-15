@@ -127,6 +127,25 @@ Com essa arquitetura, a aplicação é capaz de gerenciar notificações de form
 
 Nossa configuração Docker oferece um ambiente isolado e reproduzível para execução da aplicação, incluindo toda a stack de observabilidade.
 
+### Passo a Passo Inicial
+
+1. **Instalar Dependências**:
+
+   ```bash
+   npm install
+   ```
+
+2. **Iniciar os Contêineres**:
+
+   ```bash
+   docker compose up
+   ```
+
+3. **Executar as Migrations**:
+   ```bash
+   docker exec teddy-backoffice-api npm run migration:run
+   ```
+
 ### Recursos Disponíveis
 
 Após iniciar os contêineres com `docker compose up`, você pode acessar:
