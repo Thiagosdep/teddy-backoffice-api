@@ -78,7 +78,7 @@ export class AdminUserService {
 
   async cacheUserIds(adminId: string, userIds: string[]): Promise<void> {
     this.logger.log(
-      `Caching ${userIds.length} user IDs for admin ID=${adminId}`,
+      `Caching ${userIds.length} user ids for admin ID=${adminId}`,
       'AdminUserService',
     );
 
@@ -86,14 +86,14 @@ export class AdminUserService {
     await this.redisService.set(key, userIds);
 
     this.logger.log(
-      `Successfully cached user IDs for admin ID=${adminId}`,
+      `Successfully cached user ids for admin ID=${adminId}`,
       'AdminUserService',
     );
   }
 
   async getUserIds(adminId: string): Promise<string[]> {
     this.logger.log(
-      `Retrieving cached user IDs for admin ID=${adminId}`,
+      `Retrieving cached user ids for admin ID=${adminId}`,
       'AdminUserService',
     );
 
@@ -102,14 +102,14 @@ export class AdminUserService {
 
     if (!userIds) {
       this.logger.log(
-        `No cached user IDs found for admin ID=${adminId}`,
+        `No cached user ids found for admin ID=${adminId}`,
         'AdminUserService',
       );
       return [];
     }
 
     this.logger.log(
-      `Retrieved ${userIds.length} cached user IDs for admin ID=${adminId}`,
+      `Retrieved ${userIds.length} cached user ids for admin ID=${adminId}`,
       'AdminUserService',
     );
 

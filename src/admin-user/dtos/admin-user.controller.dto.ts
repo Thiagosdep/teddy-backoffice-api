@@ -46,7 +46,7 @@ export class AdminCreateDTO {
 
 export class AdminUserIdsDTO {
   @ApiProperty({
-    description: 'Array of user IDs to cache',
+    description: 'Array of user ids to cache',
     example: [
       '123e4567-e89b-12d3-a456-426614174000',
       '123e4567-e89b-12d3-a456-426614174001',

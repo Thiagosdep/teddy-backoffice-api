@@ -65,7 +65,7 @@ export class AdminUserController {
   @Post('/users/select')
   @ApiResponse({
     status: 200,
-    description: 'User IDs cached successfully',
+    description: 'User ids cached successfully',
   })
   async cacheUserIds(
     @Body() body: AdminUserIdsDTO,
@@ -73,14 +73,14 @@ export class AdminUserController {
   ): Promise<{ success: boolean }> {
     const adminId = req.user.sub;
     this.logger.log(
-      `Caching ${body.userIds.length} user IDs for admin ID=${adminId}`,
+      `Caching ${body.userIds.length} user ids for admin ID=${adminId}`,
       'AdminUserController',
     );
 
     await this.adminUserService.cacheUserIds(adminId, body.userIds);
 
     this.logger.log(
-      `Successfully cached user IDs for admin ID=${adminId}`,
+      `Successfully cached user ids for admin ID=${adminId}`,
       'AdminUserController',
     );
 
@@ -90,20 +90,20 @@ export class AdminUserController {
   @Get('/users/select')
   @ApiResponse({
     status: 200,
-    description: 'Get cached user IDs for admin',
+    description: 'Get cached user ids for admin',
     type: AdminUserIdsDTO,
   })
   async getUserIds(@Request() req): Promise<AdminUserIdsDTO> {
     const adminId = req.user.sub;
     this.logger.log(
-      `Retrieving cached user IDs for admin ID=${adminId}`,
+      `Retrieving cached user ids for admin ID=${adminId}`,
       'AdminUserController',
     );
 
     const userIds = await this.adminUserService.getUserIds(adminId);
 
     this.logger.log(
-      `Retrieved ${userIds.length} cached user IDs for admin ID=${adminId}`,
+      `Retrieved ${userIds.length} cached user ids for admin ID=${adminId}`,
       'AdminUserController',
     );
 

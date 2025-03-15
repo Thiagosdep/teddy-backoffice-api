@@ -13,6 +13,8 @@ import { AppConfigModule } from './infrastructure/config/config.module';
 import { AdminUserModule } from './admin-user/admin-user.module';
 import { AuthModule } from './auth/auth.module';
 import { ObservabilityModule } from './infrastructure/observability/observability.module';
+import { QueueModule } from './infrastructure/queue/queue.module';
+import { UserNotificationModule } from './user-notification/user-notification.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { ObservabilityModule } from './infrastructure/observability/observabilit
     AdminUserModule,
     AuthModule,
     ObservabilityModule,
+    QueueModule,
+    UserNotificationModule,
   ],
   controllers: [AppController, UserController],
   providers: [AppService, UserService],

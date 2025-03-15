@@ -30,7 +30,6 @@ describe('AdminUserService', () => {
   };
 
   beforeEach(async () => {
-    // Create mock logger service
     loggerService = {
       log: jest.fn(),
       error: jest.fn(),
@@ -38,7 +37,6 @@ describe('AdminUserService', () => {
       debug: jest.fn(),
     };
 
-    // Create mock Redis service
     redisService = {
       set: jest.fn().mockResolvedValue(undefined),
       get: jest.fn(),
@@ -172,7 +170,7 @@ describe('AdminUserService', () => {
   });
 
   describe('cacheUserIds', () => {
-    it('should cache user IDs in Redis', async () => {
+    it('should cache user ids in Redis', async () => {
       const adminId = 'admin-uuid';
       const userIds = ['user-1', 'user-2', 'user-3'];
 
@@ -186,7 +184,7 @@ describe('AdminUserService', () => {
   });
 
   describe('getUserIds', () => {
-    it('should return cached user IDs from Redis', async () => {
+    it('should return cached user ids from Redis', async () => {
       const adminId = 'admin-uuid';
       const userIds = ['user-1', 'user-2', 'user-3'];
 
@@ -198,7 +196,7 @@ describe('AdminUserService', () => {
       expect(result).toEqual(userIds);
     });
 
-    it('should return empty array when no cached user IDs found', async () => {
+    it('should return empty array when no cached user ids found', async () => {
       const adminId = 'admin-uuid';
 
       redisService.get.mockResolvedValue(null);

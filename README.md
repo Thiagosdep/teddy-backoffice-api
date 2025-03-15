@@ -92,6 +92,37 @@ O projeto implementa uma stack completa de observabilidade que inclui:
 - Endpoint `/metrics` para coleta pelo Prometheus
 - Dashboards no Grafana para visualização
 
+## 📬 Envio de Notificações com RabbitMQ e BullMQ
+
+A aplicação utiliza RabbitMQ e BullMQ para gerenciar o envio de notificações de forma eficiente e escalável. A seguir, uma visão geral de como esses componentes funcionam juntos.
+
+### RabbitMQ
+
+RabbitMQ é um sistema de mensageria que permite a comunicação assíncrona entre diferentes partes da aplicação. Ele é utilizado para enviar mensagens de notificação que podem ser processadas em segundo plano. A configuração do RabbitMQ na aplicação inclui:
+
+- **Exchange**: Um exchange chamado `user.notifications` é criado para gerenciar as mensagens de notificação.
+- **Queue**: As mensagens são enviadas para uma fila chamada `email-notifications`, onde são armazenadas até serem processadas.
+
+### BullMQ
+
+BullMQ é uma biblioteca de gerenciamento de filas para Node.js que permite o processamento de trabalhos em segundo plano. Na aplicação, BullMQ é utilizado para processar as notificações que são enfileiradas pelo RabbitMQ. As principais características incluem:
+
+- **Processamento de Trabalhos**: Quando uma notificação é enviada, ela é adicionada à fila `user-notifications` e processada por um worker que executa a lógica de envio (por exemplo, envio de e-mails).
+- **Gerenciamento de Retries**: BullMQ permite configurar tentativas automáticas para o envio de notificações em caso de falhas, garantindo que as mensagens sejam entregues mesmo em situações de erro temporário.
+- **Monitoramento de Estatísticas**: A aplicação pode coletar estatísticas sobre o processamento de notificações, como o número de trabalhos pendentes, ativos e concluídos.
+
+### Exemplo de Uso
+
+Para enviar uma notificação, a aplicação chama o método `sendNotification` do serviço `UserNotificationService`, que publica a mensagem no RabbitMQ e a adiciona à fila BullMQ. O worker do BullMQ processa a notificação e executa a ação apropriada (como enviar um e-mail).
+
+### Benefícios
+
+- **Escalabilidade**: O uso de RabbitMQ e BullMQ permite que a aplicação escale horizontalmente, processando múltiplas notificações simultaneamente.
+- **Desacoplamento**: A separação entre a lógica de envio de notificações e o restante da aplicação melhora a manutenibilidade e a clareza do código.
+- **Resiliência**: Com a capacidade de reprocessar mensagens em caso de falhas, a aplicação se torna mais robusta e confiável.
+
+Com essa arquitetura, a aplicação é capaz de gerenciar notificações de forma eficiente, garantindo que os usuários recebam as informações necessárias em tempo hábil.
+
 ## 🐳 Implantação com Docker
 
 Nossa configuração Docker oferece um ambiente isolado e reproduzível para execução da aplicação, incluindo toda a stack de observabilidade.

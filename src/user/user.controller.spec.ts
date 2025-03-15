@@ -248,7 +248,7 @@ describe('UserController', () => {
       );
 
       const invalidUpdateDto = {
-        user_company: [{ name: 'Company without ID' }],
+        user_company: [{ name: 'Company without id' }],
       };
 
       await expect(
