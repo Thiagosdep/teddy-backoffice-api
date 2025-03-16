@@ -194,15 +194,6 @@ As métricas da aplicação podem ser visualizadas de várias formas:
 2. **Prometheus:** Acesse http://localhost:9090 para consultar e visualizar métricas
 3. **Grafana:** Acesse http://localhost:3001 para visualizar dashboards com métricas
 
-### Analisando Traces
-
-Para visualizar e analisar traces de requisições:
-
-1. Acesse a UI do Jaeger em http://localhost:16686
-2. Selecione o serviço "teddy-backoffice-api" no menu suspenso
-3. Defina os filtros desejados e clique em "Find Traces"
-4. Clique em um trace para ver detalhes e spans individuais
-
 ## 🔒 Autenticação
 
 A API usa JWT para autenticação. Rotas protegidas requerem um token JWT válido no cabeçalho Authorization:
