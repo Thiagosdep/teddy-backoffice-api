@@ -26,6 +26,8 @@ describe('AdminUserController', () => {
           useValue: {
             create: jest.fn().mockResolvedValue(mockAdminUser),
             validateAdmin: jest.fn().mockResolvedValue('jwt-token'),
+            cacheUserId: jest.fn().mockResolvedValue(undefined),
+            removeUserId: jest.fn().mockResolvedValue(undefined),
           },
         },
         {
@@ -81,6 +83,34 @@ describe('AdminUserController', () => {
 
       expect(service.validateAdmin).toHaveBeenCalledWith(loginDto);
       expect(result).toEqual({ token });
+    });
+  });
+
+  describe('cacheUserId', () => {
+    it('should cache a single user id', async () => {
+      const userId = 'user-uuid';
+      const req = { user: { sub: 'admin-uuid' } };
+
+      jest.spyOn(service, 'cacheUserId').mockResolvedValue(undefined);
+
+      const result = await controller.cacheUserId({ userId }, req);
+
+      expect(service.cacheUserId).toHaveBeenCalledWith(req.user.sub, userId);
+      expect(result).toEqual({ success: true });
+    });
+  });
+
+  describe('removeUserId', () => {
+    it('should remove a user id from cache', async () => {
+      const userId = 'user-uuid';
+      const req = { user: { sub: 'admin-uuid' } };
+
+      jest.spyOn(service, 'removeUserId').mockResolvedValue(undefined);
+
+      const result = await controller.removeUserId({ userId }, req);
+
+      expect(service.removeUserId).toHaveBeenCalledWith(req.user.sub, userId);
+      expect(result).toEqual({ success: true });
     });
   });
 });

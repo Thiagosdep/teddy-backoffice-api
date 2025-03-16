@@ -121,41 +121,116 @@ describe('UserService', () => {
   });
 
   describe('getAll', () => {
-    it('should return paginated users', async () => {
+    it('should return paginated users with search parameter', async () => {
       // Given
-      const params = { offset: 0, limit: 10 };
+      const params = { offset: 0, limit: 10, search: 'John' };
       const mockUsers = [
         new UserEntity({
           id: randomUUID(),
           name: 'John Doe',
           email: 'johndoe@email.com',
         }),
+      ];
+      const total = 1;
+
+      const mockQueryBuilder = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getManyAndCount: jest.fn().mockResolvedValue([mockUsers, total]),
+      };
+
+      jest
+        .spyOn(userReaderRepository, 'createQueryBuilder')
+        .mockReturnValue(mockQueryBuilder as any);
+
+      // When
+      const result = await userService.getAll(params);
+
+      // Then
+      expect(userReaderRepository.createQueryBuilder).toHaveBeenCalledWith(
+        'user',
+      );
+      expect(mockQueryBuilder.leftJoinAndSelect).toHaveBeenCalledWith(
+        'user.userCompanies',
+        'userCompanies',
+      );
+      expect(mockQueryBuilder.orderBy).toHaveBeenCalledWith('user.name', 'ASC');
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'user.name ILIKE :search',
+        { search: '%John%' },
+      );
+      expect(mockQueryBuilder.skip).toHaveBeenCalledWith(params.offset);
+      expect(mockQueryBuilder.take).toHaveBeenCalledWith(params.limit);
+      expect(result).toEqual({
+        data: mockUsers,
+        total,
+        offset: params.offset,
+        limit: params.limit,
+      });
+    });
+
+    it('should return users by userIds ignoring other parameters', async () => {
+      // Given
+      const userIds = [randomUUID(), randomUUID()];
+      const params = {
+        userIds,
+        offset: 10,
+        limit: 5,
+        search: 'John',
+      };
+      const mockUsers = [
         new UserEntity({
-          id: randomUUID(),
+          id: userIds[0],
+          name: 'John Doe',
+          email: 'johndoe@email.com',
+        }),
+        new UserEntity({
+          id: userIds[1],
           name: 'Jane Doe',
           email: 'janedoe@email.com',
         }),
       ];
       const total = 2;
 
+      const mockQueryBuilder = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getManyAndCount: jest.fn().mockResolvedValue([mockUsers, total]),
+      };
+
       jest
-        .spyOn(userReaderRepository, 'findAndCount')
-        .mockResolvedValue([mockUsers, total]);
+        .spyOn(userReaderRepository, 'createQueryBuilder')
+        .mockReturnValue(mockQueryBuilder as any);
 
       // When
       const result = await userService.getAll(params);
 
       // Then
-      expect(userReaderRepository.findAndCount).toHaveBeenCalledWith({
-        skip: params.offset,
-        take: params.limit,
-        relations: ['userCompanies'],
-      });
+      expect(userReaderRepository.createQueryBuilder).toHaveBeenCalledWith(
+        'user',
+      );
+      expect(mockQueryBuilder.leftJoinAndSelect).toHaveBeenCalledWith(
+        'user.userCompanies',
+        'userCompanies',
+      );
+      expect(mockQueryBuilder.orderBy).toHaveBeenCalledWith('user.name', 'ASC');
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'user.id IN (:...userIds)',
+        { userIds },
+      );
+      expect(mockQueryBuilder.skip).not.toHaveBeenCalledWith(params.offset);
+      expect(mockQueryBuilder.take).not.toHaveBeenCalledWith(params.limit);
       expect(result).toEqual({
         data: mockUsers,
         total,
-        offset: params.offset,
-        limit: params.limit,
+        offset: 0,
+        limit: 10,
       });
     });
 

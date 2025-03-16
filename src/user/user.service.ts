@@ -45,22 +45,40 @@ export class UserService {
   }
 
   async getAll(params: {
-    offset: number;
-    limit: number;
+    offset?: number;
+    limit?: number;
+    search?: string;
+    userIds?: string[];
   }): Promise<PaginationResponse<UserEntity>> {
-    const { offset, limit } = params;
+    const { offset = 0, limit = 10, search, userIds } = params;
+
     this.logger.log(
-      `Fetching all users with offset=${offset}, limit=${limit}`,
+      `Fetching users with offset=${offset}, limit=${limit}, search=${search || 'none'}, userIds=${userIds?.length || 0}`,
       'UserService',
     );
 
-    const [users, total] = await this.userReaderRepository.findAndCount({
-      skip: offset,
-      take: limit,
-      relations: ['userCompanies'],
-    });
+    let queryBuilder = this.userReaderRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.userCompanies', 'userCompanies')
+      .orderBy('user.name', 'ASC');
 
-    if (total < offset) {
+    if (userIds && userIds.length > 0) {
+      queryBuilder = queryBuilder.andWhere('user.id IN (:...userIds)', {
+        userIds,
+      });
+    } else {
+      if (search) {
+        queryBuilder = queryBuilder.andWhere('user.name ILIKE :search', {
+          search: `%${search}%`,
+        });
+      }
+
+      queryBuilder = queryBuilder.skip(offset).take(limit);
+    }
+
+    const [users, total] = await queryBuilder.getManyAndCount();
+
+    if (total < offset && total > 0) {
       this.logger.error(
         `Out of bounds: offset=${offset}, total=${total}`,
         undefined,
@@ -73,8 +91,9 @@ export class UserService {
       `Found ${users.length} users out of ${total} total`,
       'UserService',
     );
+
     return {
-      data: users,
+      data: users.map((user) => new UserEntity(user)),
       total,
       offset,
       limit,

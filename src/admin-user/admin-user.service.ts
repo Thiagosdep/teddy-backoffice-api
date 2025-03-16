@@ -115,4 +115,42 @@ export class AdminUserService {
 
     return userIds;
   }
+
+  async cacheUserId(adminId: string, userId: string): Promise<void> {
+    this.logger.log(
+      `Caching user id=${userId} for admin ID=${adminId}`,
+      'AdminUserService',
+    );
+
+    const key = `admin:${adminId}:userIds`;
+    const existingUserIds = await this.getUserIds(adminId);
+
+    if (!existingUserIds.includes(userId)) {
+      const updatedUserIds = [...existingUserIds, userId];
+      await this.redisService.set(key, updatedUserIds);
+    }
+
+    this.logger.log(
+      `Successfully cached user id for admin ID=${adminId}`,
+      'AdminUserService',
+    );
+  }
+
+  async removeUserId(adminId: string, userId: string): Promise<void> {
+    this.logger.log(
+      `Removing user id=${userId} from cache for admin ID=${adminId}`,
+      'AdminUserService',
+    );
+
+    const key = `admin:${adminId}:userIds`;
+    const existingUserIds = await this.getUserIds(adminId);
+
+    const updatedUserIds = existingUserIds.filter((id) => id !== userId);
+    await this.redisService.set(key, updatedUserIds);
+
+    this.logger.log(
+      `Successfully removed user id for admin ID=${adminId}`,
+      'AdminUserService',
+    );
+  }
 }

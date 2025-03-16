@@ -130,7 +130,7 @@ describe('UserController', () => {
   });
 
   describe('getAll', () => {
-    it('should return paginated users', async () => {
+    it('should return paginated users with search parameter', async () => {
       const users = [
         mockUser,
         { ...mockUser, id: randomUUID(), email: 'jane@example.com' },
@@ -145,7 +145,7 @@ describe('UserController', () => {
 
       userServiceMock.getAll.mockResolvedValue(paginationResponse);
 
-      const result = await controller.getAll(0, 10);
+      const result = await controller.getAll(0, 10, 'John');
 
       expect(result).toEqual({
         data: users.map((user) =>
@@ -164,6 +164,53 @@ describe('UserController', () => {
       expect(userServiceMock.getAll).toHaveBeenCalledWith({
         limit: 10,
         offset: 0,
+        search: 'John',
+        userIds: undefined,
+      });
+    });
+
+    it('should return users by userIds', async () => {
+      const userIds = JSON.stringify([randomUUID(), randomUUID()]);
+      const users = [
+        mockUser,
+        { ...mockUser, id: userIds[1], email: 'jane@example.com' },
+      ];
+
+      const paginationResponse = {
+        data: users,
+        total: users.length,
+        offset: 0,
+        limit: 10,
+      };
+
+      userServiceMock.getAll.mockResolvedValue(paginationResponse);
+
+      const result = await controller.getAll(
+        undefined,
+        undefined,
+        undefined,
+        userIds,
+      );
+
+      expect(result).toEqual({
+        data: users.map((user) =>
+          expect.objectContaining({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            own_remuneration: user.ownRemuneration,
+          }),
+        ),
+        total: users.length,
+        offset: 0,
+        limit: 10,
+      });
+
+      expect(userServiceMock.getAll).toHaveBeenCalledWith({
+        limit: 10,
+        offset: 0,
+        search: undefined,
+        userIds,
       });
     });
 

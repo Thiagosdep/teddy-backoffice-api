@@ -65,22 +65,47 @@ export class AdminUserController {
   @Post('/users/select')
   @ApiResponse({
     status: 200,
-    description: 'User ids cached successfully',
+    description: 'User id cached successfully',
   })
-  async cacheUserIds(
-    @Body() body: AdminUserIdsDTO,
+  async cacheUserId(
+    @Body() body: { userId: string },
     @Request() req,
   ): Promise<{ success: boolean }> {
     const adminId = req.user.sub;
     this.logger.log(
-      `Caching ${body.userIds.length} user ids for admin ID=${adminId}`,
+      `Caching user id=${body.userId} for admin ID=${adminId}`,
       'AdminUserController',
     );
 
-    await this.adminUserService.cacheUserIds(adminId, body.userIds);
+    await this.adminUserService.cacheUserId(adminId, body.userId);
 
     this.logger.log(
-      `Successfully cached user ids for admin ID=${adminId}`,
+      `Successfully cached user id for admin ID=${adminId}`,
+      'AdminUserController',
+    );
+
+    return { success: true };
+  }
+
+  @Post('/users/remove')
+  @ApiResponse({
+    status: 200,
+    description: 'User id removed from cache successfully',
+  })
+  async removeUserId(
+    @Body() body: { userId: string },
+    @Request() req,
+  ): Promise<{ success: boolean }> {
+    const adminId = req.user.sub;
+    this.logger.log(
+      `Removing user id=${body.userId} from cache for admin ID=${adminId}`,
+      'AdminUserController',
+    );
+
+    await this.adminUserService.removeUserId(adminId, body.userId);
+
+    this.logger.log(
+      `Successfully removed user id for admin ID=${adminId}`,
       'AdminUserController',
     );
 

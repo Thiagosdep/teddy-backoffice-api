@@ -207,4 +207,70 @@ describe('AdminUserService', () => {
       expect(result).toEqual([]);
     });
   });
+
+  describe('cacheUserId', () => {
+    it('should add a user id to the cached list', async () => {
+      const adminId = 'admin-uuid';
+      const userId = 'user-uuid';
+      const existingUserIds = ['user-1', 'user-2'];
+
+      redisService.get.mockResolvedValue(existingUserIds);
+
+      await service.cacheUserId(adminId, userId);
+
+      expect(redisService.get).toHaveBeenCalledWith(`admin:${adminId}:userIds`);
+      expect(redisService.set).toHaveBeenCalledWith(
+        `admin:${adminId}:userIds`,
+        [...existingUserIds, userId],
+      );
+    });
+
+    it('should not add duplicate user id to the cached list', async () => {
+      const adminId = 'admin-uuid';
+      const userId = 'user-1';
+      const existingUserIds = ['user-1', 'user-2'];
+
+      redisService.get.mockResolvedValue(existingUserIds);
+
+      await service.cacheUserId(adminId, userId);
+
+      expect(redisService.get).toHaveBeenCalledWith(`admin:${adminId}:userIds`);
+      expect(redisService.set).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('removeUserId', () => {
+    it('should remove a user id from the cached list', async () => {
+      const adminId = 'admin-uuid';
+      const userId = 'user-1';
+      const existingUserIds = ['user-1', 'user-2', 'user-3'];
+      const expectedUserIds = ['user-2', 'user-3'];
+
+      redisService.get.mockResolvedValue(existingUserIds);
+
+      await service.removeUserId(adminId, userId);
+
+      expect(redisService.get).toHaveBeenCalledWith(`admin:${adminId}:userIds`);
+      expect(redisService.set).toHaveBeenCalledWith(
+        `admin:${adminId}:userIds`,
+        expectedUserIds,
+      );
+    });
+
+    it('should handle removing a non-existent user id', async () => {
+      const adminId = 'admin-uuid';
+      const userId = 'non-existent';
+      const existingUserIds = ['user-1', 'user-2'];
+
+      redisService.get.mockResolvedValue(existingUserIds);
+
+      await service.removeUserId(adminId, userId);
+
+      expect(redisService.get).toHaveBeenCalledWith(`admin:${adminId}:userIds`);
+      expect(redisService.set).toHaveBeenCalledWith(
+        `admin:${adminId}:userIds`,
+        existingUserIds,
+      );
+    });
+  });
 });

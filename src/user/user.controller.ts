@@ -39,22 +39,37 @@ export class UserController {
   })
   @ApiResponse({ status: 404, description: 'Out of bounds' })
   async getAll(
-    @Query('offset') offset: number,
-    @Query('limit') limit: number,
+    @Query('offset') offset?: number,
+    @Query('limit') limit?: number,
+    @Query('search') search?: string,
+    @Query('userIds') userIds?: string,
   ): Promise<PaginationResponse<UserDTO>> {
     this.logger.log(
-      `Getting all users with offset=${offset}, limit=${limit}`,
+      `Getting users with offset=${offset}, limit=${limit}, search=${search || 'none'}, userIds=${userIds || 'none'}`,
       'UserController',
     );
 
-    const { validatedLimit, validatedOffset } = validatePaginationQuery(
-      limit,
-      offset,
-    );
+    if (limit && offset) {
+      const { validatedLimit, validatedOffset } = validatePaginationQuery(
+        limit,
+        offset,
+      );
+
+      limit = validatedLimit;
+      offset = validatedOffset;
+    }
+
+    let parsedUserIds: string[] | undefined;
+
+    if (userIds) {
+      parsedUserIds = JSON.parse(userIds);
+    }
 
     const response = await this.userService.getAll({
-      limit: validatedLimit,
-      offset: validatedOffset,
+      limit,
+      offset,
+      search,
+      userIds: parsedUserIds,
     });
 
     this.logger.log(
