@@ -22,7 +22,7 @@ export class WinstonLoggerService {
       transports.push(
         new LokiTransport({
           host: lokiUrl,
-          labels: { app: 'teddy-backoffice-api' },
+          labels: { app: 'th-backoffice-api' },
           json: true,
           format: winston.format.json(),
           timeout: 10000,
@@ -49,7 +49,7 @@ export class WinstonLoggerService {
         winston.format.timestamp(),
         winston.format.json(),
       ),
-      defaultMeta: { service: 'teddy-backoffice-api' },
+      defaultMeta: { service: 'th-backoffice-api' },
       transports,
     });
   }

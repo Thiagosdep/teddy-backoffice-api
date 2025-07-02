@@ -4,8 +4,8 @@ import { INestApplication } from '@nestjs/common';
 
 export const createSwaggerDocument = (app: INestApplication): OpenAPIObject => {
   const options = new DocumentBuilder()
-    .setTitle('Teddy Backoffice')
-    .setDescription('The Teddy Backoffice API')
+    .setTitle('TH Backoffice')
+    .setDescription('The TH Backoffice API')
     .build();
 
   return SwaggerModule.createDocument(app, options, {

@@ -7,7 +7,7 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
-  - job_name: 'teddy-api'
+  - job_name: 'th-api'
     metrics_path: /v1/metrics
     static_configs:
       - targets: ['api:4000'] 
